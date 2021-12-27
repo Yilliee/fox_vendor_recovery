@@ -19,7 +19,7 @@
 # 	Please maintain this if you use this script or any part of it
 #
 # ******************************************************************************
-# 18 December 2021
+# 27 December 2021
 #
 # For optional environment variables - to be declared before building,
 # see "orangefox_build_vars.txt" for full details
@@ -281,7 +281,7 @@ if [ "$OF_USE_MAGISKBOOT_FOR_ALL_PATCHES" = "1" ]; then
 fi
 
 # A/B devices
-if [ "$OF_AB_DEVICE" = "1" ]; then
+if [ "$OF_AB_DEVICE" = "1" -o "$BOARD_USES_RECOVERY_AS_BOOT" = "true" ]; then
    if [ "$OF_USE_MAGISKBOOT_FOR_ALL_PATCHES" != "1" ] || [ "$OF_USE_MAGISKBOOT" != "1" ]; then
       echo -e "${RED}-- ************************************************************************************************${NC}"
       echo -e "${RED}-- OrangeFox.sh FATAL ERROR - A/B device - but other necessary vars not set. ${NC}"
@@ -295,6 +295,12 @@ fi
 
 # alternative devices
 [ -n "$OF_TARGET_DEVICES" -a -z "$TARGET_DEVICE_ALT" ] && export TARGET_DEVICE_ALT="$OF_TARGET_DEVICES"
+
+# recovery-as-boot: copy boot.img to recovery.img
+if [ "$BOARD_USES_RECOVERY_AS_BOOT" = "true" -a -f "$INSTALLED_BOOTIMAGE_TARGET" ]; then
+   echo -e "${RED}-- recovery-as-boot device: copying \"boot.img\" to \"recovery.img\" ... ${NC}"
+   $CP -f $INSTALLED_BOOTIMAGE_TARGET $OUT/recovery.img
+fi
 
 # copy recovery.img
 [ -f $OUT/recovery.img ] && $CP $OUT/recovery.img $RECOVERY_IMAGE
@@ -546,7 +552,8 @@ local TDT=$(date "+%d %B %Y")
   if [ "$OF_AB_DEVICE" = "1" ]; then
      echo -e "${RED}-- A/B device - copying magiskboot to zip installer ... ${NC}"
      tmp=$FOX_RAMDISK/$RAMDISK_SBIN/magiskboot
-     [ ! -e $tmp ] && tmp=$(find $TARGET_RECOVERY_ROOT_OUT -name magiskboot)
+     [ ! -e $tmp ] && tmp=$(find $TARGET_RECOVERY_ROOT_OUT/sbin -name magiskboot)
+     [ ! -e $tmp ] && tmp=$(find $TARGET_RECOVERY_ROOT_OUT/system -name magiskboot)
      [ ! -e $tmp ] && tmp=/tmp/fox_build_tmp/magiskboot
      $CP -pf $tmp .
      sed -i -e "s/^OF_AB_DEVICE=.*/OF_AB_DEVICE=\"1\"/" $F
