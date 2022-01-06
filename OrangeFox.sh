@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #	This file is part of the OrangeFox Recovery Project
-# 	Copyright (C) 2018-2021 The OrangeFox Recovery Project
+# 	Copyright (C) 2018-2022 The OrangeFox Recovery Project
 #
 #	OrangeFox is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -19,7 +19,9 @@
 # 	Please maintain this if you use this script or any part of it
 #
 # ******************************************************************************
-# 27 December 2021
+# 06 January 2022
+#
+# *** This script is for the OrangeFox Android 10.0 manifest ***
 #
 # For optional environment variables - to be declared before building,
 # see "orangefox_build_vars.txt" for full details
@@ -27,6 +29,12 @@
 # It is best to declare them in a script that you will use for building
 #
 #
+
+# automatically use magiskboot - overrides anything to the contrary in device trees
+# other methods for patching recovery/boot images are no longer supported
+export OF_USE_MAGISKBOOT_FOR_ALL_PATCHES=1
+export OF_USE_MAGISKBOOT=1
+
 # whether to print extra debug messages
 if [ -z "$FOX_BUILD_DEBUG_MESSAGES" ]; then
    export FOX_BUILD_DEBUG_MESSAGES="0"
@@ -273,24 +281,6 @@ DEFAULT_INSTALL_PARTITION="/dev/block/bootdevice/by-name/recovery" # !! DON'T ch
 # FOX_REPLACE_BUSYBOX_PS: default to 0
 if [ -z "$FOX_REPLACE_BUSYBOX_PS" ]; then
    export FOX_REPLACE_BUSYBOX_PS="0"
-fi
-
-# magiskboot
-if [ "$OF_USE_MAGISKBOOT_FOR_ALL_PATCHES" = "1" ]; then
-   export OF_USE_MAGISKBOOT=1
-fi
-
-# A/B devices
-if [ "$OF_AB_DEVICE" = "1" -o "$BOARD_USES_RECOVERY_AS_BOOT" = "true" ]; then
-   if [ "$OF_USE_MAGISKBOOT_FOR_ALL_PATCHES" != "1" ] || [ "$OF_USE_MAGISKBOOT" != "1" ]; then
-      echo -e "${RED}-- ************************************************************************************************${NC}"
-      echo -e "${RED}-- OrangeFox.sh FATAL ERROR - A/B device - but other necessary vars not set. ${NC}"
-      echo "-- You must do this - \"export OF_USE_MAGISKBOOT=1\" "
-      echo "-- And this         - \"export OF_USE_MAGISKBOOT_FOR_ALL_PATCHES=1\" "
-      echo -e "${RED}-- Quitting now ... ${NC}"
-      echo -e "${RED}-- ************************************************************************************************${NC}"
-      abort 200
-   fi
 fi
 
 # alternative devices
@@ -982,20 +972,13 @@ if [ "$FOX_VENDOR_CMD" = "Fox_Before_Recovery_Image" ]; then
   $CP -p $FOX_VENDOR_PATH/Files/resetprop $FOX_RAMDISK/$RAMDISK_SBIN/
 
   # deal with magiskboot/mkbootimg/unpackbootimg
-  if [ "$OF_USE_MAGISKBOOT" != "1" ]; then
-      echo -e "${GREEN}-- Not using magiskboot - deleting $FOX_RAMDISK/$RAMDISK_SBIN/magiskboot ...${NC}"
-      rm -f "$FOX_RAMDISK/$RAMDISK_SBIN/magiskboot"
-  else
-     echo -e "${GREEN}-- This build will use magiskboot for patching boot images ...${NC}"
-     if [ "$OF_USE_MAGISKBOOT_FOR_ALL_PATCHES" = "1" ]; then
-        echo -e "${GREEN}-- Using magiskboot [$FOX_RAMDISK/$RAMDISK_SBIN/magiskboot] - deleting mkbootimg/unpackbootimg ...${NC}"
-        rm -f $FOX_RAMDISK/$RAMDISK_SBIN/mkbootimg
-        rm -f $FOX_RAMDISK/$RAMDISK_SBIN/unpackbootimg
-        echo -e "${GREEN}-- Backing up $FOX_RAMDISK/$RAMDISK_SBIN/magiskboot to: /tmp/fox_build_tmp/ ...${NC}"
-        mkdir -p /tmp/fox_build_tmp/
-        $CP -pf $FOX_RAMDISK/$RAMDISK_SBIN/magiskboot /tmp/fox_build_tmp/
-     fi
-  fi
+  echo -e "${GREEN}-- This build will use magiskboot for patching boot images ...${NC}"
+  echo -e "${GREEN}-- Using magiskboot [$FOX_RAMDISK/$RAMDISK_SBIN/magiskboot] - deleting mkbootimg/unpackbootimg ...${NC}"
+  rm -f $FOX_RAMDISK/$RAMDISK_SBIN/mkbootimg
+  rm -f $FOX_RAMDISK/$RAMDISK_SBIN/unpackbootimg
+  echo -e "${GREEN}-- Backing up $FOX_RAMDISK/$RAMDISK_SBIN/magiskboot to: /tmp/fox_build_tmp/ ...${NC}"
+  mkdir -p /tmp/fox_build_tmp/
+  $CP -pf $FOX_RAMDISK/$RAMDISK_SBIN/magiskboot /tmp/fox_build_tmp/
 
   # try to fix toolbox egrep/fgrep symlink bug
   if [ "$(uses_toolbox)" = "1" ]; then
@@ -1028,7 +1011,7 @@ if [ "$FOX_VENDOR_CMD" = "Fox_Before_Recovery_Image" ]; then
 
   # replace busybox lzma (and "xz") with our own
   # use the full "xz" binary for lzma, and for xz - smaller in size, and does the same job
-  if [ "$OF_USE_MAGISKBOOT_FOR_ALL_PATCHES" != "1" -o "$FOX_USE_XZ_UTILS" = "1" ]; then
+  if [ "$FOX_USE_XZ_UTILS" = "1" ]; then
      if [ "$FOX_DYNAMIC_SAMSUNG_FIX" != "1" -a "$(enabled $FOX_CUSTOM_BINS_TO_SDCARD)" != "1" ]; then
      	echo -e "${GREEN}-- Replacing the busybox \"lzma\" command with our own full version ...${NC}"
      	rm -f $FOX_RAMDISK/$RAMDISK_SYSTEM_BIN/lzma
