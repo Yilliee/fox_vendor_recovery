@@ -43,6 +43,9 @@ elif [ "$FOX_BUILD_DEBUG_MESSAGES" = "1" ]; then
    set -o xtrace
 fi
 
+# The name of this script
+THIS_SCRIPT=$(basename $0)
+
 # some colour codes
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -418,7 +421,7 @@ expand_vendor_path() {
   [ ! -d $FOX_VENDOR_PATH/installer ] && {
      local T="${BASH_SOURCE%/*}"
      T=$(fullpath $T)
-     [ -x $T/OrangeFox.sh ] && FOX_VENDOR_PATH=$T
+     [ -x $T/$THIS_SCRIPT ] && FOX_VENDOR_PATH=$T
   }
 }
 
