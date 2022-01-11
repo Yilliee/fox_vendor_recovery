@@ -253,6 +253,15 @@
 "OF_MAINTAINER"
   - the maintainer's name
 #
+OF_MAINTAINER_AVATAR" [NEW]
+ - Full path to maintainer's avatar that will be shown on about page
+ - Image should be 32 bit (!) PNG, 192x192 px
+ - Size of image should be as small as possible (~50kb), use "advdef -4z xxx.png" to shrink image
+ - Don't put NSFW content to avatar
+ - Not recommended if you building for phone with small recovery partition
+ - eg. 'export OF_MAINTAINER_AVATAR="/home/yillie/avatar.png"'
+ - default = nothing
+#
 "OF_SCREEN_H"
   - Use this if your screen's aspect ratio is not 16:9
   - to calculate OF_SCREEN_H, if your screen width is not 1080, use this formula: <aspect ratio height>*120

@@ -1321,7 +1321,17 @@ if [ "$FOX_VENDOR_CMD" = "Fox_Before_Recovery_Image" ]; then
      process_custom_bins_to_sdcard;
   fi
 #########################################################################################
-  
+
+  if [ -n "$OF_MAINTAINER_AVATAR" ]; then
+      if [ -f "$OF_MAINTAINER_AVATAR" ]; then
+            echo -e "${GREEN}-- Using a custom maintainer picture from $OF_MAINTAINER_AVATAR ...${NC}"
+            $CP -p "$OF_MAINTAINER_AVATAR" "$FOX_RAMDISK/twres/images/Default/About/maintainer.png"
+      else
+            echo -e "${WHITEONRED}-- File $OF_MAINTAINER_AVATAR not found  ...${NC}"
+            echo -e "${WHITEONRED}-- Using default image for maintainer's about section ...${NC}"
+      fi
+  fi
+
   # Get Magisk version
   tmp1=$FOX_VENDOR_PATH/FoxFiles/Magisk.zip
   if [ -n "$FOX_USE_SPECIFIC_MAGISK_ZIP" -a -e "$FOX_USE_SPECIFIC_MAGISK_ZIP" ]; then
