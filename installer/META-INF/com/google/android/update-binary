@@ -55,6 +55,9 @@ ERROR_CODE=0
 # AB device?
 OF_AB_DEVICE=""
 
+# enable vbmeta patching for magiskboot 24+ ?
+OF_PATCH_VBMETA_FLAG=0
+
 # Reset OrangeFox settings to default?
 FOX_RESET_SETTINGS="1"
 
@@ -62,7 +65,7 @@ FOX_RESET_SETTINGS="1"
 OF_VANILLA_BUILD=0
 
 # last_modified
-MOD_DATE="20210805"
+MOD_DATE="20220204"
   
 # sundry glodal defaults
 # VEND_DIR="/vendor"
@@ -507,6 +510,13 @@ local PART
 		package_extract_file "recovery.img" "$PART"
 	   done
 	   return
+	fi
+
+	# enable the magiskboot 24+ vbmeta patch?
+	if [ "$OF_PATCH_VBMETA_FLAG" = "1" ]; then
+	   export PATCHVBMETAFLAG=true
+	else
+	   export PATCHVBMETAFLAG=false
 	fi
 
    	# extract the ramdisk from the OrangeFox image

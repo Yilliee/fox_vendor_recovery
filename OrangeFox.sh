@@ -19,7 +19,7 @@
 # 	Please maintain this if you use this script or any part of it
 #
 # ******************************************************************************
-# 06 January 2022
+# 04 February 2022
 #
 # *** This script is for the OrangeFox Android 10.0 manifest ***
 #
@@ -552,6 +552,12 @@ local TDT=$(date "+%d %B %Y")
      sed -i -e "s/^OF_AB_DEVICE=.*/OF_AB_DEVICE=\"1\"/" $F
   fi
   rm -rf /tmp/fox_build_tmp/
+
+  # whether to enable magisk 24+ patching of vbmeta
+  if [ "$OF_PATCH_VBMETA_FLAG" = "1" ]; then
+     echo -e "${RED}-- Enabling PATCHVBMETAFLAG for the installation... ${NC}"
+     sed -i -e "s/^OF_PATCH_VBMETA_FLAG=.*/OF_PATCH_VBMETA_FLAG=\"1\"/" $F
+  fi
 
   # Reset Settings
   if [ "$FOX_RESET_SETTINGS" = "disabled" ]; then
