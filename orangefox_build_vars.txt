@@ -510,8 +510,7 @@ OF_MAINTAINER_AVATAR" [NEW]
 - default = 0
 #
 "FOX_ENABLE_APP_MANAGER" [NEW]
-- set this to 1 to enable the OrangeFox App Manager (now disabled by default)
-- sometimes there are issues with the App Manager, especially with Android 11 - if you don't care, then use this variable to enable it
+- set this to 1 to enable the OrangeFox's App Manager (now disabled by default)
 - default = 0
 #
 "FOX_USE_GREP_BINARY" [NEW]
